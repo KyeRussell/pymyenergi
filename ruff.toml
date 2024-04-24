@@ -1,6 +1,21 @@
 line-length = 120
 target-version = "py38"
 lint.extend-select = [
-  "UP",  # pyupgrade
-  "I",  # isort
+  "UP",     # pyupgrade
+  "I",      # isort
+  "W",      # Warning
+  "N",      # pep8-naming
+  "YTT",    # flake8-2020
+  "ASYNC",  # flake8-async
+  "B",      # flake8-bugbear
+  "A",      # flake8-builtins
+  "C4",     # flake8-comprehensions
+  "DTZ",    # flake8-datetimez
+  "ICN",    # flake8-import-conventions
+  "G",      # flake8-logging-format
+  "PIE",    # flake8-pie
+  "Q",      # flake8-quotes
+  "RSE",    # flake8-raise
+  "SIM",    # flake8-simplify
+  "PTH",    # flake8-use-pathlib
 ]

@@ -20,7 +20,7 @@ async def test_init(bypass_client_fetch_data):
 
 async def test_init_error(error_on_client_fetch_data):
     client = MyenergiClient(conn)
-    with pytest.raises(Exception):
+    with pytest.raises(Exception):  # noqa: B017
         assert await client.refresh()
 
 

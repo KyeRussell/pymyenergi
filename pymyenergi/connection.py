@@ -10,7 +10,7 @@ import sys
 import httpx
 from pycognito import Cognito
 
-from .exceptions import MyenergiException, TimeoutException, WrongCredentials
+from .exceptions import MyenergiError, MyenergiTimeoutError, WrongCredentialsError
 
 _LOGGER = logging.getLogger(__name__)
 _USER_POOL_ID = "eu-west-2_E57cCJB20"
@@ -47,23 +47,23 @@ class Connection:
         self.invitation_id = ""
         _LOGGER.debug("New connection created")
 
-    def _checkMyenergiServerURL(self, responseHeader):
-        if "X_MYENERGI-asn" in responseHeader:
-            new_url = "https://" + responseHeader["X_MYENERGI-asn"]
+    def _check_myenergi_server_url(self, response_header):
+        if "X_MYENERGI-asn" in response_header:
+            new_url = "https://" + response_header["X_MYENERGI-asn"]
             if new_url != self.base_url:
-                _LOGGER.info(f"Updated myenergi active server to {new_url}")
+                _LOGGER.info("Updated myenergi active server to %s", new_url)
             self.base_url = new_url
         else:
             _LOGGER.debug("Myenergi ASN not found in Myenergi header, assume auth failure (bad username)")
-            raise WrongCredentials()
+            raise WrongCredentialsError
 
-    async def discoverLocations(self):
+    async def discover_locations(self):
         locs = await self.get("/api/Location", oauth=True)
         # check if guest location - use the first location by default
         if locs["content"][0]["isGuestLocation"] is True:
             self.invitation_id = locs["content"][0]["invitationData"]["invitationId"]
 
-    def checkAndUpdateToken(self):
+    def check_and_update_token(self):
         # check if we have oauth credentials
         if self.app_email and self.app_password:
             # check if we have to renew out token
@@ -76,25 +76,25 @@ class Connection:
             # check if we have oauth credentials
             if self.app_email and self.app_password:
                 async with httpx.AsyncClient(headers=self.oauth_headers, timeout=self.timeout) as httpclient:
-                    theUrl = self.oauth_base_url + url
+                    the_url = self.oauth_base_url + url
                     # if we have an invitiation id, we need to add that to the query
                     if self.invitation_id != "":
-                        if "?" in theUrl:
-                            theUrl = theUrl + "&invitationId=" + self.invitation_id
+                        if "?" in the_url:
+                            the_url = the_url + "&invitationId=" + self.invitation_id
                         else:
-                            theUrl = theUrl + "?invitationId=" + self.invitation_id
+                            the_url = the_url + "?invitationId=" + self.invitation_id
                     try:
-                        _LOGGER.debug(f"{method} {url} {theUrl}")
-                        response = await httpclient.request(method, theUrl, json=json)
-                    except httpx.ReadTimeout:
-                        raise TimeoutException()
+                        _LOGGER.debug("%s %s %s", method, url, the_url)
+                        response = await httpclient.request(method, the_url, json=json)
+                    except httpx.ReadTimeout as e:
+                        raise MyenergiTimeoutError from e
                     else:
-                        _LOGGER.debug(f"{method} status {response.status_code}")
+                        _LOGGER.debug("%s status %s", method, response.status_code)
                         if response.status_code == 200:
                             return response.json()
                         elif response.status_code == 401:
-                            raise WrongCredentials()
-                        raise MyenergiException(response.status_code)
+                            raise WrongCredentialsError
+                        raise MyenergiError(response.status_code)
             else:
                 _LOGGER.error("Trying to use OAuth without app credentials")
 
@@ -105,32 +105,32 @@ class Connection:
                 if self.base_url is None or self.do_query_asn:
                     _LOGGER.debug("Get Myenergi base url from director")
                     try:
-                        directorUrl = self.director_url + "/cgi-jstatus-E"
-                        response = await httpclient.get(directorUrl)
+                        director_url = self.director_url + "/cgi-jstatus-E"
+                        response = await httpclient.get(director_url)
                     except Exception:
                         _LOGGER.error("Myenergi server request problem")
                         _LOGGER.debug(sys.exc_info()[0])
                     else:
                         self.do_query_asn = False
-                        self._checkMyenergiServerURL(response.headers)
-                theUrl = self.base_url + url
+                        self._check_myenergi_server_url(response.headers)
+                the_url = self.base_url + url
                 try:
-                    _LOGGER.debug(f"{method} {url} {theUrl}")
-                    response = await httpclient.request(method, theUrl, json=json)
-                except httpx.ReadTimeout:
+                    _LOGGER.debug("%s %s %s", method, url, the_url)
+                    response = await httpclient.request(method, the_url, json=json)
+                except httpx.ReadTimeout as e:
                     # Make sure to query for ASN next request, might be a server problem
                     self.do_query_asn = True
-                    raise TimeoutException()
+                    raise MyenergiTimeoutError from e
                 else:
-                    _LOGGER.debug(f"GET status {response.status_code}")
-                    self._checkMyenergiServerURL(response.headers)
+                    _LOGGER.debug("GET status %s", response.status_code)
+                    self._check_myenergi_server_url(response.headers)
                     if response.status_code == 200:
                         return response.json()
                     elif response.status_code == 401:
-                        raise WrongCredentials()
+                        raise WrongCredentialsError
                     # Make sure to query for ASN next request, might be a server problem
                     self.do_query_asn = True
-                    raise MyenergiException(response.status_code)
+                    raise MyenergiError(response.status_code)
 
     async def get(self, url, data=None, oauth=False):
         return await self.send("GET", url, data, oauth)

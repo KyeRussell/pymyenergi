@@ -7,7 +7,8 @@ from .base_device import BaseDevice
 class Harvi(BaseDevice):
     """Zappi Client for myenergi API."""
 
-    def __init__(self, connection: Connection, serialno, data={}) -> None:
+    def __init__(self, connection: Connection, serialno, data=None) -> None:
+        data = data or {}
         super().__init__(connection, serialno, data)
 
     @property

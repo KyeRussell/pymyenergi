@@ -102,9 +102,8 @@ class MyenergiClient:
             if device.ct2.is_assigned:
                 self._totals[device.ct2.name] = self._totals.get(device.ct2.name, 0) + device.ct2.power
 
-            if device.kind in [ZAPPI, HARVI, LIBBI]:
-                if device.ct3.is_assigned:
-                    self._totals[device.ct3.name] = self._totals.get(device.ct3.name, 0) + device.ct3.power
+            if device.kind in [ZAPPI, HARVI, LIBBI] and device.ct3.is_assigned:
+                self._totals[device.ct3.name] = self._totals.get(device.ct3.name, 0) + device.ct3.power
             if device.kind == EDDI:
                 zappi_or_eddi_or_libbi = device
             if device.kind == ZAPPI or device.kind == LIBBI:
@@ -209,7 +208,7 @@ class MyenergiClient:
                 if key == "fwv":
                     self._firmware_version = grp[key]
                 else:
-                    _LOGGER.debug(f"Unknown device type: {key}")
+                    _LOGGER.debug("Unknown device type: %s", key)
                 continue
             devices = grp[key]
             for device_data in devices:
@@ -223,10 +222,10 @@ class MyenergiClient:
                         serial_key,
                         f"{existing_device.kind}-{existing_device.serial_number}",
                     )
-                    _LOGGER.debug(f"Adding {existing_device.kind} {existing_device.name}")
+                    _LOGGER.debug("Adding %s %s", existing_device.kind, existing_device.name)
                     self.devices[serial] = existing_device
                 else:
-                    _LOGGER.debug(f"Updating {existing_device.kind} {existing_device.name}")
+                    _LOGGER.debug("Updating %s %s", existing_device.kind, existing_device.name)
                     existing_device.data = device_data
 
                 # Update the extra information available on libbi

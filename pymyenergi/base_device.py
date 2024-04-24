@@ -130,7 +130,7 @@ class BaseDevice(ABC):
             url = f"/cgi-jday-{self.prefix}{self._serialno}-{date_from.year}-{date_from.month}-{date_from.day}-{date_from.hour}-0-{how_long}"
         else:
             url = f"/cgi-jdayhour-{self.prefix}{self._serialno}-{date_from.year}-{date_from.month}-{date_from.day}-{date_from.hour}-{how_long}"
-        _LOGGER.debug(f"Fetching {resolution} history data for {self.kind}")
+        _LOGGER.debug("Fetching %s history data for %s", resolution, self.kind)
         data = await self._connection.get(url)
         data = data[f"U{self.serial_number}"]
         if raw_response:

@@ -1,10 +1,9 @@
 #!/usr/bin/env python
-import os
+from pathlib import Path
 
 from setuptools import setup
 
-version_file = open(os.path.join("pymyenergi", "VERSION"))
-version = version_file.read().strip()
+version = (Path("pymyenergi") / "VERSION").read().strip()
 
 setup(
     name="pymyenergi",
@@ -12,7 +11,7 @@ setup(
     author="Johan Isaksson",
     author_email="johan@generatorhallen.se",
     description="Python library and CLI for communicating with myenergi API.",
-    long_description=open("README.md").read(),
+    long_description=Path("README.md").read(),
     long_description_content_type="text/markdown",
     package_data={"pymyenergi": ["VERSION"]},
     include_package_data=True,

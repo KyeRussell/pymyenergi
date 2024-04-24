@@ -1,13 +1,15 @@
 """Global fixtures"""
 
 import json
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
 
 def load_fixture_json(name):
-    with open(f"tests/fixtures/{name}.json") as json_file:
+    path = Path(__file__).parent / "fixtures" / f"{name}.json"
+    with path.open() as json_file:
         data = json.load(json_file)
         return data
 

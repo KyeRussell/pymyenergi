@@ -44,24 +44,25 @@ LIBBI_MODE_CONFIG = {
 class Libbi(BaseDevice):
     """Libbi Client for myenergi API."""
 
-    def __init__(self, connection: Connection, serialno, data={}) -> None:
+    def __init__(self, connection: Connection, serialno, data=None) -> None:
         self.history_data = {}
         self._extra_data = {}
+        data = data or {}
         super().__init__(connection, serialno, data)
 
     async def refresh_extra(self):
         # only refresh this data if we have app credentials
         if self._connection.app_email and self._connection.app_password:
-            chargeFromGrid = await self._connection.get(
+            charge_from_grid = await self._connection.get(
                 "/api/AccountAccess/LibbiMode?serialNo=" + str(self.serial_number),
                 oauth=True,
             )
-            self._extra_data["charge_from_grid"] = chargeFromGrid["content"][str(self.serial_number)]
-            chargeTarget = await self._connection.get(
+            self._extra_data["charge_from_grid"] = charge_from_grid["content"][str(self.serial_number)]
+            charge_target = await self._connection.get(
                 "/api/AccountAccess/" + str(self.serial_number) + "/LibbiChargeSetup",
                 oauth=True,
             )
-            self._extra_data["charge_target"] = chargeTarget["content"]["energyTarget"]
+            self._extra_data["charge_target"] = charge_target["content"]["energyTarget"]
 
     @property
     def kind(self):
@@ -265,10 +266,7 @@ class Libbi(BaseDevice):
         ret = ret + f"Status: {self.status}\n"
         ret = ret + "Local Mode: " + self.get_mode_description(self.local_mode) + "\n"
         ret = ret + "Charge from Grid: "
-        if self.charge_from_grid:
-            ret = ret + "Enabled\n"
-        else:
-            ret = ret + "Disabled\n"
+        ret = ret + "Enabled\n" if self.charge_from_grid else ret + "Disabled\n"
         ret = ret + f"Charge target: {self.charge_target}kWh\n"
         ret = ret + f"CT 1 {self.ct1.name} {self.ct1.power}W phase {self.ct1.phase}\n"
         ret = ret + f"CT 2 {self.ct2.name} {self.ct2.power}W phase {self.ct2.phase}\n"

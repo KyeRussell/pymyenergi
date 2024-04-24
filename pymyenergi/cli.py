@@ -3,14 +3,14 @@ import asyncio
 import configparser
 import json
 import logging
-import os
 import sys
 from getpass import getpass
+from pathlib import Path
 
 from pymyenergi.client import MyenergiClient, device_factory
 from pymyenergi.connection import Connection
 from pymyenergi.eddi import BOOST_TARGETS, EDDI_MODES
-from pymyenergi.exceptions import WrongCredentials
+from pymyenergi.exceptions import WrongCredentialsError
 from pymyenergi.libbi import LIBBI_MODES
 from pymyenergi.zappi import CHARGE_MODES
 
@@ -20,25 +20,24 @@ logging.basicConfig()
 logging.root.setLevel(logging.WARNING)
 
 
+ROOT_DIR = Path(__file__).resolve().parent
+
+
 async def main(args):
     username = args.username or input("Please enter your hub serial number: ")
     password = args.password or getpass(prompt="Password (apikey): ")
     app_email = args.app_email or input("App email (enter to skip; only needed for libbi): ")
-    if app_email:
-        app_password = args.app_password or getpass(prompt="App password: ")
-    else:
-        app_password = ""
+    app_password = args.app_password or getpass(prompt="App password: ") if app_email else ""
     conn = Connection(username, password, app_password, app_email)
     if app_email and app_password:
-        await conn.discoverLocations()
+        await conn.discover_locations()
     if args.debug:
         logging.root.setLevel(logging.DEBUG)
     client = MyenergiClient(conn)
     try:
         if args.version:
-            ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-            version_file = open(os.path.join(ROOT_DIR, "VERSION"))
-            version = version_file.read().strip()
+            with (ROOT_DIR / "VERSION").open() as version_file:  # noqa: ASYNC101
+                version = version_file.read().strip()
             print(version)
             sys.exit(0)
         if args.command == "list":
@@ -68,7 +67,7 @@ async def main(args):
                     if args.json:
                         print(json.dumps(data, indent=2))
                     else:
-                        for key in data.keys():
+                        for key in data:
                             print(f"{key}: {data[key]}kWh")
                 elif args.action == "stop" and args.command == ZAPPI:
                     await device.stop_charge()
@@ -144,14 +143,14 @@ async def main(args):
                         print("Could not start smart boost, charge mode must be Eco or Eco+")
         else:
             sys.exit("Dont know what to do, type myenergi --help form available commands")
-    except WrongCredentials:
+    except WrongCredentialsError:
         sys.exit("Wrong username or password")
 
 
 def cli():
     config = configparser.ConfigParser()
     config["hub"] = {"serial": "", "password": "", "app_password": "", "app_email": ""}
-    config.read([".myenergi.cfg", os.path.expanduser("~/.myenergi.cfg")])
+    config.read([".myenergi.cfg", Path.expanduser("~/.myenergi.cfg")])
     parser = argparse.ArgumentParser(prog="myenergi", description="myenergi CLI.")
     parser.add_argument(
         "-u",
