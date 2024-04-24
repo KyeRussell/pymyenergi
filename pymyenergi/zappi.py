@@ -16,6 +16,7 @@ PLUG_STATES = {
 }
 SINGLE_PHASE = "SINGLE_PHASE"
 
+
 class Zappi(BaseDevice):
     """Zappi Client for myenergi API."""
 
@@ -30,9 +31,7 @@ class Zappi(BaseDevice):
 
     async def fetch_boost_data(self):
         """Fetch data from myenergi"""
-        response = await self._connection.get(
-            f"/cgi-boost-time-{self.prefix}{self._serialno}"
-        )
+        response = await self._connection.get(f"/cgi-boost-time-{self.prefix}{self._serialno}")
         data = response
         return data
 
@@ -329,9 +328,7 @@ class Zappi(BaseDevice):
     async def set_charge_mode(self, mode):
         """Set charge mode, one of Fast, Eco, Eco+ or Stopped"""
         mode_int = CHARGE_MODES.index(mode.capitalize())
-        await self._connection.get(
-            f"/cgi-zappi-mode-Z{self._serialno}-{mode_int}-0-0-0000"
-        )
+        await self._connection.get(f"/cgi-zappi-mode-Z{self._serialno}-{mode_int}-0-0-0000")
         # Set local data if successful
         self._data["zmo"] = mode_int
         return True
@@ -347,25 +344,19 @@ class Zappi(BaseDevice):
         """Start boost"""
         if self.charge_mode not in ["Eco", "Eco+"]:
             return False
-        await self._connection.get(
-            f"/cgi-zappi-mode-Z{self._serialno}-0-10-{int(amount)}-0000"
-        )
+        await self._connection.get(f"/cgi-zappi-mode-Z{self._serialno}-0-10-{int(amount)}-0000")
         return True
 
     async def set_priority(self, priority):
         """Set device priority"""
-        await self._connection.get(
-            f"/cgi-set-priority-Z{self._serialno}-{int(priority)}"
-        )
+        await self._connection.get(f"/cgi-set-priority-Z{self._serialno}-{int(priority)}")
         self._data["pri"] = int(priority)
         return True
 
     async def start_smart_boost(self, amount, complete_by):
         """Start smart boost"""
         time = complete_by.replace(":", "")
-        await self._connection.get(
-            f"/cgi-zappi-mode-Z{self._serialno}-0-11-{int(amount)}-{time}"
-        )
+        await self._connection.get(f"/cgi-zappi-mode-Z{self._serialno}-0-11-{int(amount)}-{time}")
         return True
 
     async def unlock(self):

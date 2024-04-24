@@ -55,7 +55,7 @@ class Eddi(BaseDevice):
 
     @property
     def hsk(self):
-        """ Heatsink temperature """
+        """Heatsink temperature"""
         val = self._data.get("hsk", None)
         if val is not None:
             val = val / 10
@@ -181,29 +181,21 @@ class Eddi(BaseDevice):
     async def manual_boost(self, target: str, time: int):
         """Start manual boost of target for time minutes"""
         target_int = BOOST_TARGETS[target.lower().replace(" ", "")]
-        await self._connection.get(
-            f"/cgi-eddi-boost-E{self._serialno}-10-{target_int}-{time}"
-        )
+        await self._connection.get(f"/cgi-eddi-boost-E{self._serialno}-10-{target_int}-{time}")
         return True
 
     async def set_priority(self, priority):
         """Set device priority"""
-        await self._connection.get(
-            f"/cgi-set-priority-E{self._serialno}-{int(priority)}"
-        )
+        await self._connection.get(f"/cgi-set-priority-E{self._serialno}-{int(priority)}")
         self._data["pri"] = int(priority)
         return True
 
     async def set_heater_priority(self, target: str):
         """Start manual boost of target for time minutes"""
         target_int = BOOST_TARGETS[target.lower().replace(" ", "")]
-        response = await self._connection.get(
-            f"/cgi-set-heater-priority-E{self._serialno}"
-        )
+        response = await self._connection.get(f"/cgi-set-heater-priority-E{self._serialno}")
         cpm = response.get("cpm", 0)
-        await self._connection.get(
-            f"/cgi-set-heater-priority-E{self._serialno}-{target_int}-{cpm}"
-        )
+        await self._connection.get(f"/cgi-set-heater-priority-E{self._serialno}-{target_int}-{cpm}")
         self._data["hpri"] = target_int
         return True
 

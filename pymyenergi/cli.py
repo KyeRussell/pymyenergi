@@ -32,7 +32,7 @@ async def main(args):
     if app_email:
         app_password = args.app_password or getpass(prompt="App password: ")
     else:
-        app_password = ''
+        app_password = ""
     conn = Connection(username, password, app_password, app_email)
     if app_email and app_password:
         await conn.discoverLocations()
@@ -79,10 +79,7 @@ async def main(args):
                     await device.stop_charge()
                     print("Charging was stopped")
                 elif args.action == "mode" and args.command == ZAPPI:
-                    if (
-                        len(args.arg) < 1
-                        or args.arg[0].capitalize() not in CHARGE_MODES
-                    ):
+                    if len(args.arg) < 1 or args.arg[0].capitalize() not in CHARGE_MODES:
                         modes = ", ".join(CHARGE_MODES)
                         sys.exit(f"A mode must be specifed, one of {modes}")
                     await device.set_charge_mode(args.arg[0])
@@ -125,9 +122,7 @@ async def main(args):
                 elif args.action == "boost" and args.command == EDDI:
                     if len(args.arg) < 2 or args.arg[0] not in BOOST_TARGETS:
                         targets = ", ".join(BOOST_TARGETS)
-                        sys.exit(
-                            f"A boost target and time must be specifed, one of {targets}"
-                        )
+                        sys.exit(f"A boost target and time must be specifed, one of {targets}")
                     if await device.manual_boost(args.arg[0], args.arg[1]):
                         print(f"Start boosting {args.arg[0]} for {args.arg[1]} minutes")
                     else:
@@ -142,26 +137,18 @@ async def main(args):
                 elif args.action == "heaterpriority" and args.command == EDDI:
                     if len(args.arg) < 1 or args.arg[0] not in BOOST_TARGETS:
                         targets = ", ".join(BOOST_TARGETS)
-                        sys.exit(
-                            f"A priority target must be specifed, one of {targets}"
-                        )
+                        sys.exit(f"A priority target must be specifed, one of {targets}")
                     if await device.set_heater_priority(args.arg[0]):
                         print(f"Heater priority was set to {args.arg[0]}")
                     else:
                         print("Could not set heater priority")
                 elif args.action == "smart-boost" and args.command == ZAPPI:
                     if await device.start_smart_boost(args.arg[0], args.arg[1]):
-                        print(
-                            f"Start smart boosting with {args.arg[0]}kWh complete by {args.arg[1]}"
-                        )
+                        print(f"Start smart boosting with {args.arg[0]}kWh complete by {args.arg[1]}")
                     else:
-                        print(
-                            "Could not start smart boost, charge mode must be Eco or Eco+"
-                        )
+                        print("Could not start smart boost, charge mode must be Eco or Eco+")
         else:
-            sys.exit(
-                "Dont know what to do, type myenergi --help form available commands"
-            )
+            sys.exit("Dont know what to do, type myenergi --help form available commands")
     except WrongCredentials:
         sys.exit("Wrong username or password")
 
@@ -202,9 +189,7 @@ def cli():
     subparser_list = subparsers.add_parser("list", help="list devices")
     subparser_list.add_argument("-k", "--kind", dest="kind", default="all")
     subparsers.add_parser("overview", help="show overview")
-    subparser_zappi = subparsers.add_parser(
-        ZAPPI, help="use zappi --help for available commands"
-    )
+    subparser_zappi = subparsers.add_parser(ZAPPI, help="use zappi --help for available commands")
     subparser_zappi.add_argument("-s", "--serial", dest="serial", default=None)
     subparser_zappi.add_argument(
         "action",
@@ -221,9 +206,7 @@ def cli():
         ],
     )
     subparser_zappi.add_argument("arg", nargs="*")
-    subparser_eddi = subparsers.add_parser(
-        EDDI, help="use eddi --help for available commands"
-    )
+    subparser_eddi = subparsers.add_parser(EDDI, help="use eddi --help for available commands")
     subparser_eddi.add_argument("-s", "--serial", dest="serial", default=None)
     subparser_eddi.add_argument(
         "action",
@@ -231,16 +214,12 @@ def cli():
     )
     subparser_eddi.add_argument("arg", nargs="*")
 
-    subparser_harvi = subparsers.add_parser(
-        HARVI, help="use harvi --help for available commands"
-    )
+    subparser_harvi = subparsers.add_parser(HARVI, help="use harvi --help for available commands")
     subparser_harvi.add_argument("-s", "--serial", dest="serial", default=None)
     subparser_harvi.add_argument("action", choices=["show"])
     subparser_harvi.add_argument("arg", nargs="*")
 
-    subparser_libbi = subparsers.add_parser(
-        LIBBI, help="use libbi --help for available commands"
-    )
+    subparser_libbi = subparsers.add_parser(LIBBI, help="use libbi --help for available commands")
     subparser_libbi.add_argument("-s", "--serial", dest="serial", default=None)
     subparser_libbi.add_argument(
         "action",

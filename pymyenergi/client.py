@@ -97,36 +97,24 @@ class MyenergiClient:
         self._totals[CT_GENERATION] = 0
         for device in devices:
             if device.ct1.is_assigned:
-                self._totals[device.ct1.name] = (
-                    self._totals.get(device.ct1.name, 0) + device.ct1.power
-                )
+                self._totals[device.ct1.name] = self._totals.get(device.ct1.name, 0) + device.ct1.power
             if device.ct2.is_assigned:
-                self._totals[device.ct2.name] = (
-                    self._totals.get(device.ct2.name, 0) + device.ct2.power
-                )
+                self._totals[device.ct2.name] = self._totals.get(device.ct2.name, 0) + device.ct2.power
 
             if device.kind in [ZAPPI, HARVI, LIBBI]:
                 if device.ct3.is_assigned:
-                    self._totals[device.ct3.name] = (
-                        self._totals.get(device.ct3.name, 0) + device.ct3.power
-                    )
+                    self._totals[device.ct3.name] = self._totals.get(device.ct3.name, 0) + device.ct3.power
             if device.kind == EDDI:
                 zappi_or_eddi_or_libbi = device
             if device.kind == ZAPPI or device.kind == LIBBI:
                 zappi_or_eddi_or_libbi = device
                 if device.kind == ZAPPI or device.kind == LIBBI:
                     if device.ct4.is_assigned:
-                        self._totals[device.ct4.name] = (
-                            self._totals.get(device.ct4.name, 0) + device.ct4.power
-                        )
+                        self._totals[device.ct4.name] = self._totals.get(device.ct4.name, 0) + device.ct4.power
                     if device.ct5.is_assigned:
-                        self._totals[device.ct5.name] = (
-                            self._totals.get(device.ct5.name, 0) + device.ct5.power
-                        )
+                        self._totals[device.ct5.name] = self._totals.get(device.ct5.name, 0) + device.ct5.power
                     if device.ct6.is_assigned:
-                        self._totals[device.ct6.name] = (
-                            self._totals.get(device.ct6.name, 0) + device.ct6.power
-                        )
+                        self._totals[device.ct6.name] = self._totals.get(device.ct6.name, 0) + device.ct6.power
 
         if zappi_or_eddi_or_libbi is not None:
             self._totals[FREQUENCY_GRID] = zappi_or_eddi_or_libbi.supply_frequency
@@ -214,8 +202,8 @@ class MyenergiClient:
         for grp in self._data:
             keys = list(grp.keys())
             key = keys[0]
-            if(len(keys) > 1 and keys[1] == 'fwv'):
-                self._firmware_version = grp['fwv']
+            if len(keys) > 1 and keys[1] == "fwv":
+                self._firmware_version = grp["fwv"]
             if key not in DEVICE_TYPES:
                 if key == "fwv":
                     self._firmware_version = grp[key]
@@ -225,27 +213,19 @@ class MyenergiClient:
             devices = grp[key]
             for device_data in devices:
                 serial = device_data.get("sno")
-                self._update_available = device_data.get('newBootloaderAvailable', False)
+                self._update_available = device_data.get("newBootloaderAvailable", False)
                 existing_device = self.devices.get(serial, None)
                 if existing_device is None:
-                    existing_device = device_factory(
-                        self._connection, key, serial, device_data
-                    )
-                    serial_key = existing_device.prefix + str(
-                        existing_device.serial_number
-                    )
+                    existing_device = device_factory(self._connection, key, serial, device_data)
+                    serial_key = existing_device.prefix + str(existing_device.serial_number)
                     existing_device.name = self.find_device_name(
                         serial_key,
                         f"{existing_device.kind}-{existing_device.serial_number}",
                     )
-                    _LOGGER.debug(
-                        f"Adding {existing_device.kind} {existing_device.name}"
-                    )
+                    _LOGGER.debug(f"Adding {existing_device.kind} {existing_device.name}")
                     self.devices[serial] = existing_device
                 else:
-                    _LOGGER.debug(
-                        f"Updating {existing_device.kind} {existing_device.name}"
-                    )
+                    _LOGGER.debug(f"Updating {existing_device.kind} {existing_device.name}")
                     existing_device.data = device_data
 
                 # Update the extra information available on libbi

@@ -18,9 +18,7 @@ async def get_data() -> None:
     zappi = Zappi(conn, zappi_serial)
     await zappi.refresh()
     print(f"Zappi S/N {zappi.serial_number} version {zappi.firmware_version}")
-    print(
-        f"Status: {zappi.status} Plug status: {zappi.plug_status} Locked: {zappi.locked}"
-    )
+    print(f"Status: {zappi.status} Plug status: {zappi.plug_status} Locked: {zappi.locked}")
     print(f"Priority: {zappi.priority}")
     print(f"Charge mode: {zappi.charge_mode}")
     print("")
@@ -37,9 +35,7 @@ async def get_data() -> None:
     print(f"CT 5 {zappi.ct5.name} {zappi.ct5.power}W")
     print(f"CT 6 {zappi.ct6.name} {zappi.ct6.power}W")
     print("")
-    print(
-        f"Supply voltage: {zappi.supply_voltage}V frequency: {zappi.supply_frequency}Hz"
-    )
+    print(f"Supply voltage: {zappi.supply_voltage}V frequency: {zappi.supply_frequency}Hz")
     print("Power:")
     print(f"  Grid      : {zappi.power_grid}W")
     print(f"  Generated : {zappi.power_generated}W")

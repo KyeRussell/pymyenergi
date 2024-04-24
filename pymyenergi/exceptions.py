@@ -3,6 +3,7 @@
 Python Package for controlling Porsche Connect API.
 
 """
+
 import logging
 
 _LOGGER = logging.getLogger(__name__)

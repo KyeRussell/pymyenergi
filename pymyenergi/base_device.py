@@ -86,9 +86,7 @@ class BaseDevice(ABC):
 
     async def fetch_data(self):
         """Fetch data from myenergi"""
-        response = await self._connection.get(
-            f"/cgi-jstatus-{self.prefix}{self._serialno}"
-        )
+        response = await self._connection.get(f"/cgi-jstatus-{self.prefix}{self._serialno}")
         data = response[self.kind][0]
         return data
 
@@ -98,9 +96,7 @@ class BaseDevice(ABC):
         # return await self.history_energy_minutes(today, 1440)
         return await self.history_energy_hours(today, 24, raw_response)
 
-    async def history_energy_minutes(
-        self, date_from, how_long=1440, raw_response=False
-    ):
+    async def history_energy_minutes(self, date_from, how_long=1440, raw_response=False):
         if date_from is None:
             date_from = datetime.now(timezone.utc) - timedelta(minutes=how_long)
         return await self.fetch_history_data(date_from, how_long, MINUTE, raw_response)
@@ -110,9 +106,7 @@ class BaseDevice(ABC):
             date_from = datetime.now(timezone.utc) - timedelta(hours=how_long)
         return await self.fetch_history_data(date_from, how_long, HOUR, raw_response)
 
-    async def fetch_history_data(
-        self, date_from, how_long, resolution, raw_response=False
-    ):
+    async def fetch_history_data(self, date_from, how_long, resolution, raw_response=False):
         energy_wh = {
             "gep": 0,
             "gen": 0,
@@ -134,7 +128,7 @@ class BaseDevice(ABC):
             "ivi1": 0,
             "bdp1": 0,
             "bcp1": 0,
-            "pvp1": 0
+            "pvp1": 0,
         }
         if resolution == MINUTE:
             url = f"/cgi-jday-{self.prefix}{self._serialno}-{date_from.year}-{date_from.month}-{date_from.day}-{date_from.hour}-0-{how_long}"
@@ -149,19 +143,13 @@ class BaseDevice(ABC):
         for row in data:
             for key in energy_wh:
                 if key in ["ct1", "ct2", "ct3", "ct4", "ct5", "ct6"]:
-                    watt_hours = (
-                        row.get(f"pe{key}", 0) / 3600 - row.get(f"ne{key}", 0) / 3600
-                    )
+                    watt_hours = row.get(f"pe{key}", 0) / 3600 - row.get(f"ne{key}", 0) / 3600
                 else:
                     watt_hours = row.get(key, 0) / 3600
                 energy_wh[key] = energy_wh[key] + watt_hours
 
-        device_boosted = round(
-            (energy_wh["h1b"] + energy_wh["h2b"] + energy_wh["h3b"]) / 1000, 2
-        )
-        device_green = round(
-            (energy_wh["h1d"] + energy_wh["h2d"] + energy_wh["h3d"]) / 1000, 2
-        )
+        device_boosted = round((energy_wh["h1b"] + energy_wh["h2b"] + energy_wh["h3b"]) / 1000, 2)
+        device_green = round((energy_wh["h1d"] + energy_wh["h2d"] + energy_wh["h3d"]) / 1000, 2)
 
         return_data = {
             "generated": round(energy_wh["gep"] / 1000, 2),
@@ -169,11 +157,11 @@ class BaseDevice(ABC):
             "grid_export": round(energy_wh["exp"] / 1000, 2),
             "battery_charge": round(energy_wh["bcp1"] / 1000, 2),
             "battery_discharge": round(energy_wh["bdp1"] / 1000, 2),
-            "inverter_export": round(energy_wh["ive1"] /1000, 2),
-            "inverter_import": round(energy_wh["ivi1"] /1000, 2),
+            "inverter_export": round(energy_wh["ive1"] / 1000, 2),
+            "inverter_import": round(energy_wh["ivi1"] / 1000, 2),
             "device_boosted": device_boosted,
             "device_green": device_green,
-            "device_total": device_boosted + device_green
+            "device_total": device_boosted + device_green,
         }
         if resolution == MINUTE:
             return_data["pv_total"] = round(energy_wh["pvp1"] / 1000, 2)
@@ -183,9 +171,7 @@ class BaseDevice(ABC):
             if hasattr(self, key):
                 ct_key = getattr(self, key).name_as_key
                 if ct_key != "ct_none":
-                    return_data[ct_key] = round(
-                        (return_data.get(ct_key, 0) + (energy_wh[f"ct{i+1}"] / 1000)), 2
-                    )
+                    return_data[ct_key] = round((return_data.get(ct_key, 0) + (energy_wh[f"ct{i+1}"] / 1000)), 2)
         return return_data
 
     @property
@@ -250,9 +236,7 @@ class BaseDevice(ABC):
 
     async def refresh_history_data(self, from_date, how_long, resolution):
         """Refresh device history data"""
-        self.history_data = await self.fetch_history_data(
-            from_date, how_long, resolution
-        )
+        self.history_data = await self.fetch_history_data(from_date, how_long, resolution)
 
     async def refresh(self):
         """Refresh device data"""

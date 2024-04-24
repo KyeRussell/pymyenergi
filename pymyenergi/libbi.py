@@ -56,9 +56,7 @@ class Libbi(BaseDevice):
                 "/api/AccountAccess/LibbiMode?serialNo=" + str(self.serial_number),
                 oauth=True,
             )
-            self._extra_data["charge_from_grid"] = chargeFromGrid["content"][
-                str(self.serial_number)
-            ]
+            self._extra_data["charge_from_grid"] = chargeFromGrid["content"][str(self.serial_number)]
             chargeTarget = await self._connection.get(
                 "/api/AccountAccess/" + str(self.serial_number) + "/LibbiChargeSetup",
                 oauth=True,
@@ -82,10 +80,6 @@ class Libbi(BaseDevice):
     def local_mode(self):
         """Get current known status"""
         return self._data.get("lmo", 1)
-
-    @property
-    def prefix(self):
-        return "E"
 
     @property
     def ct_keys(self):
@@ -223,9 +217,7 @@ class Libbi(BaseDevice):
         """Set operating mode"""
         print("current mode", self.get_mode_description(self._data["lmo"]))
         mode_int = LIBBI_MODE_CONFIG[mode.capitalize()]["mode_int"]
-        await self._connection.get(
-            f"/cgi-libbi-mode-{self.prefix}{self._serialno}-{mode_int}"
-        )
+        await self._connection.get(f"/cgi-libbi-mode-{self.prefix}{self._serialno}-{mode_int}")
         self._data["lmo"] = LIBBI_MODE_CONFIG[mode.capitalize()]["mode_name"]
         return True
 
@@ -240,9 +232,7 @@ class Libbi(BaseDevice):
 
     async def set_priority(self, priority):
         """Set device priority"""
-        await self._connection.get(
-            f"/cgi-set-priority-{self.prefix}{self._serialno}-{int(priority)}"
-        )
+        await self._connection.get(f"/cgi-set-priority-{self.prefix}{self._serialno}-{int(priority)}")
         self._data["pri"] = int(priority)
         return True
 

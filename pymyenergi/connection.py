@@ -3,6 +3,7 @@
 Python Package for connecting to myenergi API.
 
 """
+
 import logging
 import sys
 from typing import Text
@@ -16,14 +17,20 @@ from .exceptions import TimeoutException
 from .exceptions import WrongCredentials
 
 _LOGGER = logging.getLogger(__name__)
-_USER_POOL_ID = 'eu-west-2_E57cCJB20'
-_CLIENT_ID = '2fup0dhufn5vurmprjkj599041'
+_USER_POOL_ID = "eu-west-2_E57cCJB20"
+_CLIENT_ID = "2fup0dhufn5vurmprjkj599041"
+
 
 class Connection:
     """Connection to myenergi API."""
 
     def __init__(
-        self, username: Text = None, password: Text = None, app_password: Text = None, app_email: Text = None, timeout: int = 20
+        self,
+        username: Text = None,
+        password: Text = None,
+        app_password: Text = None,
+        app_email: Text = None,
+        timeout: int = 20,
     ) -> None:
         """Initialize connection object."""
         self.timeout = timeout
@@ -41,7 +48,7 @@ class Connection:
             self.oauth.authenticate(password=self.app_password)
             self.oauth_headers = {"Authorization": f"Bearer {self.oauth.access_token}"}
         self.do_query_asn = True
-        self.invitation_id = ''
+        self.invitation_id = ""
         _LOGGER.debug("New connection created")
 
     def _checkMyenergiServerURL(self, responseHeader):
@@ -51,15 +58,13 @@ class Connection:
                 _LOGGER.info(f"Updated myenergi active server to {new_url}")
             self.base_url = new_url
         else:
-            _LOGGER.debug(
-                "Myenergi ASN not found in Myenergi header, assume auth failure (bad username)"
-            )
+            _LOGGER.debug("Myenergi ASN not found in Myenergi header, assume auth failure (bad username)")
             raise WrongCredentials()
 
     async def discoverLocations(self):
         locs = await self.get("/api/Location", oauth=True)
         # check if guest location - use the first location by default
-        if locs["content"][0]["isGuestLocation"] == True:
+        if locs["content"][0]["isGuestLocation"] is True:
             self.invitation_id = locs["content"][0]["invitationData"]["invitationId"]
 
     def checkAndUpdateToken(self):
@@ -74,13 +79,11 @@ class Connection:
         if oauth:
             # check if we have oauth credentials
             if self.app_email and self.app_password:
-                async with httpx.AsyncClient(
-                    headers=self.oauth_headers, timeout=self.timeout
-                ) as httpclient:
+                async with httpx.AsyncClient(headers=self.oauth_headers, timeout=self.timeout) as httpclient:
                     theUrl = self.oauth_base_url + url
                     # if we have an invitiation id, we need to add that to the query
-                    if (self.invitation_id != ""):
-                        if ("?" in theUrl):
+                    if self.invitation_id != "":
+                        if "?" in theUrl:
                             theUrl = theUrl + "&invitationId=" + self.invitation_id
                         else:
                             theUrl = theUrl + "?invitationId=" + self.invitation_id
@@ -102,9 +105,7 @@ class Connection:
         # Use Digest Auth for director.myenergi.net and s18.myenergi.net
         else:
             # If base URL has not been set, make a request to director to fetch it
-            async with httpx.AsyncClient(
-                auth=self.auth, headers=self.headers, timeout=self.timeout
-            ) as httpclient:
+            async with httpx.AsyncClient(auth=self.auth, headers=self.headers, timeout=self.timeout) as httpclient:
                 if self.base_url is None or self.do_query_asn:
                     _LOGGER.debug("Get Myenergi base url from director")
                     try:
