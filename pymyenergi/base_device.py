@@ -1,14 +1,10 @@
 import logging
-from abc import ABC
-from abc import abstractmethod
-from datetime import datetime
-from datetime import timedelta
-from datetime import timezone
+from abc import ABC, abstractmethod
+from datetime import datetime, timedelta, timezone
 
 from pymyenergi.connection import Connection
 
-from . import HOUR
-from . import MINUTE
+from . import HOUR, MINUTE
 
 _LOGGER = logging.getLogger(__name__)
 

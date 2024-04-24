@@ -7,19 +7,14 @@ import os
 import sys
 from getpass import getpass
 
-from pymyenergi.client import device_factory
-from pymyenergi.client import MyenergiClient
+from pymyenergi.client import MyenergiClient, device_factory
 from pymyenergi.connection import Connection
-from pymyenergi.eddi import BOOST_TARGETS
-from pymyenergi.eddi import EDDI_MODES
+from pymyenergi.eddi import BOOST_TARGETS, EDDI_MODES
 from pymyenergi.exceptions import WrongCredentials
-from pymyenergi.zappi import CHARGE_MODES
 from pymyenergi.libbi import LIBBI_MODES
+from pymyenergi.zappi import CHARGE_MODES
 
-from . import EDDI
-from . import HARVI
-from . import ZAPPI
-from . import LIBBI
+from . import EDDI, HARVI, LIBBI, ZAPPI
 
 logging.basicConfig()
 logging.root.setLevel(logging.WARNING)

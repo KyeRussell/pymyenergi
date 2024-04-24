@@ -79,7 +79,7 @@ optional arguments:
 
 ## Library usage
 
-Install pymyenergi using pip (requires Python > 3.6)
+Install pymyenergi using pip (requires Python > 3.8)
 
 ### Example library usage
 

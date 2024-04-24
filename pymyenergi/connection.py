@@ -6,15 +6,11 @@ Python Package for connecting to myenergi API.
 
 import logging
 import sys
-from typing import Text
 
 import httpx
-
 from pycognito import Cognito
 
-from .exceptions import MyenergiException
-from .exceptions import TimeoutException
-from .exceptions import WrongCredentials
+from .exceptions import MyenergiException, TimeoutException, WrongCredentials
 
 _LOGGER = logging.getLogger(__name__)
 _USER_POOL_ID = "eu-west-2_E57cCJB20"

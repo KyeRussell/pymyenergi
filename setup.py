@@ -19,7 +19,7 @@ setup(
     url="https://github.com/cjne/pymyenergi",
     license="MIT",
     packages=["pymyenergi"],
-    python_requires=">=3.6",
+    python_requires=">=3.8",
     install_requires=["httpx", "pycognito"],
     classifiers=[
         "License :: OSI Approved :: MIT License",
