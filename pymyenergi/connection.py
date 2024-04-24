@@ -26,10 +26,10 @@ class Connection:
 
     def __init__(
         self,
-        username: Text = None,
-        password: Text = None,
-        app_password: Text = None,
-        app_email: Text = None,
+        username: str = None,
+        password: str = None,
+        app_password: str = None,
+        app_email: str = None,
         timeout: int = 20,
     ) -> None:
         """Initialize connection object."""

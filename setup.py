@@ -12,7 +12,7 @@ setup(
     author="Johan Isaksson",
     author_email="johan@generatorhallen.se",
     description="Python library and CLI for communicating with myenergi API.",
-    long_description=open("README.md", "r").read(),
+    long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     package_data={"pymyenergi": ["VERSION"]},
     include_package_data=True,
